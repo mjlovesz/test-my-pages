@@ -3734,14 +3734,20 @@
       return '';
     }
 
+    console.log(99, str);
+
     let slug = str
       .trim()
+      .replace(/(：|、|“|，|？|。|&#39;|`)+/g, '')
       .replace(/[A-Z]+/g, lower)
       .replace(/<[^>]+>/g, '')
       .replace(re, '')
       .replace(/\s/g, '-')
       .replace(/-+/g, '-')
-      .replace(/^(\d)/, '_$1');
+      // .replace(/^(\d)/, '_$1');
+
+    
+    console.log(99, slug);
     let count = cache$1[slug];
 
     count = Object.keys(cache$1).includes(slug) ? count + 1 : 0;
