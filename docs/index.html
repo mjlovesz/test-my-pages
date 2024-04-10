@@ -22,16 +22,12 @@
       name: 'AIT',
       themeColor: '#3F51B5',
       repo: 'https://gitee.com/ascend/ait',
-      mergeNavbar: true,
+      // mergeNavbar: true,
       // routerMode: 'history',
-      loadSidebar: 'sidebar-menu.md',
+      loadSidebar: 'menu.md',
       autoHeader: true,
       relativePath: true,
-      loadNavbar: 'nav-menu.md',
-      alias: {
-        '/.*/sidebar-menu.md': `/test-my-pages/sidebar-menu.md`,
-        '/.*/nav-menu.md': `/test-my-pages/nav-menu.md`
-      },
+      loadNavbar: 'menu.md',
       coverpage: "start-page.md",
       // urlBasePath: "/docs/",
       // basePath: '/test-my-pages/',
@@ -45,7 +41,7 @@
       },
       skipLink: false,
       onlyCover: true,
-      subMaxLevel: 2,
+      subMaxLevel: 3,
       loadNavbarOnCover: true,
       search: 'auto', // 默认值
       markdown: {
