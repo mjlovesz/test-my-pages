@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
   <meta name="description" content="Description">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
-  <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/docsify@4/lib/themes/vue.css">
+  <link rel="stylesheet" href="assert/vue.min.css">
   <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.css">
 </head>
 
@@ -17,23 +17,36 @@
 
   <script>
     var num = 0;
+    var path = "docs"
     window.$docsify = {
       name: 'AIT',
       themeColor: '#3F51B5',
       repo: 'https://gitee.com/ascend/ait',
       mergeNavbar: true,
-      routerMode: 'history',
-      homepage: 'index.md',
+      // routerMode: 'history',
       loadSidebar: 'sidebar-menu.md',
       autoHeader: true,
+      relativePath: true,
       loadNavbar: 'nav-menu.md',
       alias: {
-        '/.*/sidebar-menu.md': '/test-my-pages/sidebar-menu.md',
-        '/.*/nav-menu.md': '/test-my-pages/nav-menu.md'
+        '/.*/sidebar-menu.md': `/docs/sidebar-menu.md`,
+        '/.*/nav-menu.md': `/docs/nav-menu.md`
       },
       coverpage: "start-page.md",
+      // urlBasePath: "/docs/",
+      // basePath: '/test-my-pages/',
+      // // 多个封面页
+      // coverpage: ['/test-my-pages/'],
+
+      // // 多个封面页，并指定文件名
+      coverpage: {
+        '/docs/': 'start-page.md',
+        '/': 'start-page.md',
+      },
+      skipLink: false,
       onlyCover: true,
       subMaxLevel: 2,
+      loadNavbarOnCover: true,
       search: 'auto', // 默认值
       markdown: {
         renderer: {
@@ -44,7 +57,13 @@
               );
             }
             return this.origin.code.apply(this, arguments);
-          }
+          },
+          // link: function () {
+          //   console.log(arguments)
+          //   let xx = this.origin.link.apply(this, arguments);
+          //   console.log(xx)
+          //   return xx;
+          // }
         }
       },
       plugins: [
@@ -60,7 +79,7 @@
             let newContent = content;
 
             for (const mdUrl of urls) {
-              let mdContent = await window.Docsify.get("nav-menu.md")
+              let mdContent = await window.Docsify.get(mdUrl)
               newContent = content.replace(`[INCLUDE](${mdUrl})`, mdContent);
             }
 
@@ -70,7 +89,7 @@
     }
   </script>
   <!-- Docsify v4 -->
-  <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
+  <script src="assert/docsify.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/docsify-copy-code/dist/docsify-copy-code.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
@@ -79,9 +98,6 @@
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-c.min.js"></script>
   <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-rust.min.js"></script>
-
-
-
 
 </body>
 

@@ -4,4 +4,4 @@
 
 [xxxx](nihao.html "haha")
 
-[INCLUDE](nav-menu.md)
+[INCLUDE](/docs/nav-menu.md)
