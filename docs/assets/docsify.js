@@ -123,7 +123,13 @@
    * find(nav, 'a') => nav.querySelector('a')
    */
   function find(el, node) {
-    return node ? el.querySelector(node) : $.querySelector(el);
+    try {
+      return node ? el.querySelector(node) : $.querySelector(el);
+    } catch (err) {
+      return node
+        ? el.querySelector(node.substring(0, 1) + '\\3' + node.substring(1))
+        : $.querySelector(el.substring(0, 1) + '\\3' + el.substring(1));
+    }
   }
 
   /**
@@ -3734,20 +3740,15 @@
       return '';
     }
 
-    console.log(99, str);
-
     let slug = str
       .trim()
-      .replace(/(：|、|“|，|？|。|&#39;|`)+/g, '')
       .replace(/[A-Z]+/g, lower)
       .replace(/<[^>]+>/g, '')
       .replace(re, '')
       .replace(/\s/g, '-')
       .replace(/-+/g, '-')
+      .replace(/(：|、|“|，|？|。|&#39;|`)+/g, '');
       // .replace(/^(\d)/, '_$1');
-
-    
-    console.log(99, slug);
     let count = cache$1[slug];
 
     count = Object.keys(cache$1).includes(slug) ? count + 1 : 0;
@@ -8957,8 +8958,13 @@
         );
 
         if (loadSidebar && activeEl) {
-          activeEl.parentNode.innerHTML +=
-            this.compiler.subSidebar(subMaxLevel) || '';
+          const parser = new DOMParser();
+
+          const innerHtml = this.compiler.subSidebar(subMaxLevel);
+          if (innerHtml) {
+            const innerElem = parser.parseFromString(innerHtml, 'text/html').body.firstChild;
+            activeEl.insertAdjacentElement('afterend', innerElem);
+          }
         } else {
           // Reset toc
           this.compiler.subSidebar();
@@ -9312,11 +9318,11 @@
           let path = null;
           /** @type {string} */
           let routePath = this.route.path;
-          console.log('gigi', routePath, urlBasePath);
+          // console.log('gigi', routePath, urlBasePath);
           if (routePath.startsWith(urlBasePath)) {
             routePath = routePath.substring(urlBasePath.length);
           }
-          console.log('giga', routePath, urlBasePath);
+          // console.log('giga', routePath, urlBasePath);
           if (typeof coverpage === 'string') {
             if (routePath === '') {
               path = coverpage;

@@ -11,7 +11,7 @@
   - index.html 界面主页，负责界面展示。不需要变更
   - doc-guidelines.md 当前文档，文档编写规范
   - /install 安装相关文档
-  - /assert 界面展示所需的 js 和 css 文件，不需要变更
+  - /assets 界面展示所需的 js 和 css 文件，不需要变更
   - /pics 存放 md 文档需要用到的图片
   - 其他目录为不同工具的说明文档
     - README.md 工具主页

@@ -17,15 +17,8 @@
   - [性能优化](/profile/)
   - [推理迁移](/transplt/)
   - [模型转换](/convert/)
-  - ***
-  - [术语表](/glossary)
 
-- api 与 命令行参数
-
-  - [TODO](/glossary)
-
-- 注意事项
-
-  - [TODO](/glossary)
-
+- [术语表](/glossary/)
+- [api 与 命令行参数](/glossary/)
+- [常见问题](/glossary/)
 - [文档编写规范](/doc-guidelines.md)
