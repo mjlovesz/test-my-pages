@@ -8,7 +8,7 @@
     - [大模型推理精度工具](/llm/v1.0/大模型推理精度工具说明文档.md)
     - [精度预检能力使用说明](/llm/v1.0/精度预检能力使用说明.md)
     - [自动映射比对能力说明](/llm/v1.0/自动映射比对能力说明.md)
-    - [历史版本](/llm/history.md)
+    - [历史版本](/llm/history/)
   - [推理性能](/benchmark/)
   - [改图](/debug/surgeon/README.md)
   - [精度定位](/debug/compare/)
