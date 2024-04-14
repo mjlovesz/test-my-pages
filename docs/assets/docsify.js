@@ -3740,14 +3740,15 @@
       return '';
     }
 
-    let slug = str
+    let slug = escape(unescape(str)
       .trim()
       .replace(/[A-Z]+/g, lower)
       .replace(/<[^>]+>/g, '')
       .replace(re, '')
       .replace(/\s/g, '-')
       .replace(/-+/g, '-')
-      .replace(/(：|、|“|，|？|。|&#39;|`)+/g, '');
+      .replace(/\&/g, '')
+      .replace(/(：|、|“|，|？|。)+/g, ''));
       // .replace(/^(\d)/, '_$1');
     let count = cache$1[slug];
 

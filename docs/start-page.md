@@ -1,6 +1,6 @@
 # [Ascend Inference Tools 昇腾推理工具链](README.md)
 
-[ AIT - 【Powered by MindStudio】 - 点击进入](surgeon/README.md)
+[ AIT - 【Powered by MindStudio】 - 点击进入](README.md)
 
 ![img.png](pics/ait_flow.png)
 
