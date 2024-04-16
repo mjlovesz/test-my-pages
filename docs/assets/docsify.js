@@ -3740,16 +3740,16 @@
       return '';
     }
 
-    let slug = escape(unescape(str)
-      .trim()
-      .replace(/[A-Z]+/g, lower)
-      .replace(/<[^>]+>/g, '')
-      .replace(re, '')
-      .replace(/\s/g, '-')
-      .replace(/-+/g, '-')
-      .replace(/\&/g, '')
-      .replace(/(：|、|“|，|？|。)+/g, ''));
-      // .replace(/^(\d)/, '_$1');
+    let slug = escape(
+      unescape(str)
+        .trim()
+        .replace(/[A-Z]+/g, lower)
+        .replace(/<[^>]+>/g, '')
+        .replace(re, '')
+        .replace(/\s/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/(：|、|“|，|？|。|（|）|`)+/g, '')
+    );
     let count = cache$1[slug];
 
     count = Object.keys(cache$1).includes(slug) ? count + 1 : 0;

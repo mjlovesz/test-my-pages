@@ -1,334 +1,39 @@
-
-
-# 大模型推理精度工具（Large Language Model Debug Tool) 
+# 大模型推理精度工具（Large Language Model Debug Tool)
 
 ## 简介
 
-目前昇腾大模型推理框架主要有 [**加速库**](../glossary/README.md#at-Ascend-Transformer-Boost) 和 [**torchair**](../glossary/README.md#torchairtorch-图模式) 。
+目前昇腾大模型推理框架主要有 [**加速库(atb)**](../glossary/README.md#at-Ascend-Transformer-Boost) 和 [**torchair**](../glossary/README.md#torchairtorch-图模式)。在推理开发过程中可能会遇到精度问题。
 
-大模型精度调试工具（Large Language Model Debug Tool) 用于帮助开发者快速定位出推理开发过程中精度问题根因，以提升开发效率。
+大模型精度调试工具（Large Language Model Debug Tool) 用于帮助开发者快速定位推理开发过程中精度问题，发现根因，提升开发效率。
 
+## 大模型精度调试步骤
 
-### 大模型精度调试步骤
-一般分为以下3个步骤，从整网到算子，从外到内，从粗到细定位根因，具体定位操作可以视情况调整。
+大模型精度调试定位，一般思路是从整网到算子，从外到内，从粗到细逐步定位根因，具体定位操作可以视情况调整。一般分为以下 3 个步骤：
+
 1. 定位存在精度问题的输入
-    1. 数据集评估精度定位: 如果数据集评估不理想，可以通过工具定位数据集中存在精度问题的数据输入 (todo： 7.0.0 RC2 实现)
-    2. 输出token精度定位: 生成任务发现输出误差逐渐变大，可以通过工具定位存在首先出现精度问题的输出token (todo： 7.0.0 RC2 实现)
+   1. **数据集评估精度定位**: 如果数据集评估不理想，可以通过工具定位数据集中存在精度问题的数据输入 (todo： 7.0.0 RC2 实现)
+   2. **输出 token 精度定位**: 如果生成任务发现输出误差逐渐变大，可以通过工具定位首先出现精度问题的输出 token (todo： 7.0.0 RC2 实现)
 2. 定位存在精度问题的算子
-    1. 逐层算子比对: 当相同输入但是npu和cpu(gpu)输出不一致，可以通过逐层算子比对方式定位存在到精度问题的算子
-    2. 异常检测: 定位推理过程中是否存在算子预算溢出、内存踩踏
+   1. **整网算子精度比对**: 当相同输入但是 npu 和 cpu(gpu)输出不一致，可以通过逐层算子比对方式定位到存在精度问题的算子。
+      - 排查流程说明文档：
+        - [**《整网算子精度比对-加速库推理场景》**](./整网算子精度比对-加速库推理场景.md)，加速库推理场景，如何定位存在精度问题算子
+        - [**《整网算子精度比对-torchair 推理场景》**](./整网算子精度比对-torchair推理场景.md)，torchair 推理场景，如何定位存在精度问题算子
+      - 相关功能：
+        - [**《加速库 DUMP 功能使用说明》**](./加速库DUMP功能使用说明.md)，提供了 dump 加速库的网络结构、算子信息、推理输入输出等信息，支撑后续手动和自动比对、分析工作。
+        - [**《自动比对功能使用说明》**](./自动比对功能使用说明.md)，提供了自动比对功能，比对标杆数据和推理数据之间的误差。
+   2. **异常检测**: 定位推理过程中是否存在算子预算溢出、内存踩踏。可以参考[**《异常检测功能使用说明》**](异常检测功能使用说明.md)
 3. 单算子分析
-    1. 单算子精度预检: 工具提供加速库内置算子的精度预检能力，根据模型推理时dump的tensor及算子信息，计算标杆output，比较dump的算子output与标杆数据的误差，以检测算子精度是否达标。
+   1. **单算子精度预检**: 工具提供加速库内置算子的精度预检能力，根据模型推理时 dump 的 tensor 及算子信息，计算标杆 output，比较 dump 的算子 output 与标杆数据的误差，以检测算子精度是否达标。可以参考[**《精度预检功能使用说明》**](精度预检功能使用说明.md)
 
-### 精度问题工具定位思路
-精度问题一般是通过精度比对来定位。比对的是标杆数据和当前推理工程数据。标杆数据一般来自于cpu或者gpu 推理结果。所以我们通常定位步骤如下：
+## 精度问题工具定位思路
+
+精度问题一般是通过比对标杆数据和当前推理数据的误差来定位。标杆数据一般来自于 cpu 或者 gpu 推理结果。所以我们通常定位步骤如下：
+
 1. dump：获取标杆数据和当前推理工程数据
-    - 标杆数据dump：数据来源一般来自于 cpu 或者 gpu 在线推理，通过当前工具提供的接口进行 dump 
-    - 当前推理工程数据dump：根据推理的框架不同，通过不同方式进行数据 dump
-    - dump 的数据类型有：
-        * 整网输入输出
-        * 算子输入输出
-        * kernel 输入输出
-        * 网络结构
-        * 等等
+   - 标杆数据 dump：数据来源一般来自于 cpu 或者 gpu 在线推理，通过当前工具提供的接口进行 dump
+   - 当前推理工程数据 dump：根据推理的框架不同，通过不同方式进行数据 dump
+   - dump 的数据类型有：整网输入输出、算子输入输出、kernel 输入输出、网络结构、等等
 2. 精度比对：比对标杆数据和自己的数据
-    - 如果比对算子输入输出，需要根据网络结构分析，进行算子映射。也可以手动写映射关系
-    - 目前支持比对算子算法有：，也可以自定义比对算法
-
-
-
-## 1. 基于加速库推理场景
-
-### 1.1 数据dump能力
-
-提供大模型推理数据的 dump 功能，包括加速库模型数据dump以及torch-npu（gpu）模型数据dump。
-
-#### 加速库模型数据dump
-
-提供大模型推理过程中产生的中间数据的dump能力，如tensor、model拓扑信息、layer拓扑信息、算子信息、cpu_profiling数据等。
-
-##### 使用方式
-
-```
-ait llm dump --exec "bash run.sh patches/models/modeling_xxx.py" [可选参数]
-```
-
-##### 参数说明
-
-| 参数名                         | 描述                                                         | 必选 |
-| ------------------------------ | ------------------------------------------------------------ | ---- |
-| --exec                         | 指定拉起执行大模型推理脚本的命令，使用示例： --exec "bash run.sh patches/models/modeling_xxx.py"。**注：命令中不支持重定向字符，如果需要重定向输出，建议将执行命令写入shell脚本，然后启动shell脚本。** | 是   |
-| --type                         | dump类型，可选范围：['model', 'layer', 'op', 'kernel', 'tensor', 'cpu_profiling', 'onnx']，分别表示保存model拓扑信息、layer拓扑信息、算子信息、kernel算子信息、tesnor数据、cpu_profiling数据、onnx模型。其中'onnx'需要和'model'、'layer'组合使用，用于将model和layer的拓扑信息转换成onnx，可视化模型结构。默认为['tensor']。使用方式：--type layer tensor | 否   |
-| -sd，--only-save-desc          | 只保存tensor描述信息开关，默认为否，开启开关时将dump tensor的描述信息，使用方式：-sd | 否   |
-| -ids，--save-operation-ids     | 设置dump指定id的算子的tensor，默认为空，全量dump。使用方式：-ids 2, 3_1 表示只dump第2个operation和第3个operation的第1个算子的数据，id从0开始。若不确定算子id，可以先执行ait llm dump --exec xx --type model命令，将model信息dump下来，即可获得模型中所有的算子id信息。 | 否   |
-| -er，--execute-range           | 指定dump的token轮次范围，区间左右全闭，可以支持多个区间序列，默认为第0次，使用方式：-er 1,3 或 -er 3,5,7,7（代表区间[3,5],[7,7],也就是第3，4，5，7次token） | 否   |
-| -child，--save-operation-child | 选择是否dump所有子操作的tensor数据，仅使用ids场景下有效，默认为true。使用方式：-child True | 否   |
-| -time，--save-time             | 选择保存的时间节点，取值[0,1,2]，0代表保存执行前(before)，1代表保存执行后(after)，2代表前后都保存。默认保存after。使用方式：-time 0 | 否   |
-| -opname，--operation-name      | 指定需要dump的算子类型，只需要指定算子名称的开头，可以模糊匹配，如selfattention只需要填写self。使用方式：-opname self | 否   |
-| -tiling，--save-tiling         | 选择是否需要保存tiling数据，默认为false。使用方式：-tiling   | 否   |
-| --save-tensor-part, -stp       | 指定保存tensor的部分，0为仅intensor，1为仅outtensor，2为全部保存，默认为2。使用示例：-stp 1 | 否   |
-| -o, --output                   | 指定dump数据的输出目录，默认为'./'，使用示例：-o aasx/sss    | 否   |
-| -device, --device-id           | 指定dump数据的device id，默认为 None 表示不限制。如指定 --device-id 1，将只dump 1卡的数据 | 否   |
-| -l, --log-level                | 指定log level，默认为 info，可选值 debug, info, warning, error, fatal, critical | 否   |
-
-##### Dump 落盘位置
-
-Dump默认落盘路径 `{DUMP_DIR}`在当前目录下，如果指定output目录，落盘路径则为指定的 `{OUTPUT_DIR}`。
-
-- tensor信息会生成在默认落盘路径的ait_dump目录下，具体路径是 `{DUMP_DIR}/ait_dump/tensors/{device_id}_{PID}/{TID}`目录下(使用老版本的cann包可能导致tensor落盘路径不同）。
-- layer信息会生成在默认落盘路径的ait_dump目录下，具体路径是 `{DUMP_DIR}/ait_dump/layer/{PID}`目录下。
-- model信息会生成在默认落盘路径的ait_dump目录下，具体路径是 `{DUMP_DIR}/ait_dump/model/{PID}`目录下。注：由于model由layer组合而成，因此使用model时，默认同时会落盘layer信息。
-- onnx需要和layer、model配合使用，落盘位置和model、layer相同的目录。
-- cpu_profiling信息会生成在默认落盘路径的ait_dump目录下，具体路径是 `{DUMP_DIR}/ait_dump/cpu_profiling/{TIMESTAMP}/operation_statistic_{executeCount}.txt`。
-- 算子信息会生成在默认落盘路径的ait_dump目录下，具体路径是 `{DUMP_DIR}/ait_dump/operation_io_tensors/{PID}/operation_tensors_{executeCount}.csv`。
-- kernel算子信息会生成在默认落盘路径的ait_dump目录下，具体路径是 `{DUMP_DIR}/ait_dump/kernel_io_tensors/{PID}/kernel_tensors_{executeCount}.csv`。
-
-注：`{device_id}`为设备号；`{PID}`为进程号；`{TID}`为 `token_id`；`{TIMESTAMP}`为时间戳；`{executeCount}`为 `operation`运行次数。
-
-##### API说明
-
-###### 拓扑信息转onnx可视化模型：
-
-```python
-from ait_llm.common.json_fitter import atb_json_to_onnx
-
-model_level = 1   # 可视化模型的节点深度，按需填写，比如填写为1，则表示生成深度为1的可视化模型，不填默认生成最大深度可视化模型
-layer_topo_info = "./XXX_layer.json"   # dump出来的layer拓扑信息或者model拓扑信息
-atb_json_to_onnx(layer_topo_info, model_level)
-```
-
-#### torch-npu(gpu)模型推理数据dump
-
-支持torch模型推理数据的dump，包括tensor，模型拓扑信息等，提供python API来使能数据dump。1.0版本仅支持torch.nn.Module类算子数据的dump，torch其他api数据dump将在后续版本中支持。
-
-##### API说明
-
-###### DumpConfig
-
-接口说明：dump数据配置类，可用于按需dump模型数据。
-
-接口原型：DumpConfig(dump_path, token_range, module_list, tensor_part)
-
-| 参数名      | 含义                   | 使用说明                                                     | 是否必填 |
-| ----------- | ---------------------- | ------------------------------------------------------------ | -------- |
-| dump_path   | 设置dump的数据路径     | 数据类型：str，默认为当前目录。                              | 否       |
-| token_range | 需要dump的token列表    | 数据类型：list。默认为[0]，只dump第0个token的数据。          | 否       |
-| module_list | 指定要hook的module类型 | 数据类型：list，默认为[]，即dump所有module的数据。           | 否       |
-| tensor_part | 指定要dump哪部分数据   | 数据类型：int，默认为2。当tensor_part=0时，只dump输入数据；当tensor_part=1时，只dump输出数据； 当tensor_part=2时，dump输入和输出的数据。 | 否       |
-| device_id   | 指定要dump的device id  | 数据类型：int，默认为None 表示不限制 device。如指定 device_id=1，将跳过其他 device 的 dump。 | 否       |
-
-###### register_hook
-
-接口说明：给模型添加hook，用于dump数据
-
-接口原型：register_hook(model, config, hook_name=”dump_data”)
-
-| 参数名    | 含义           | 使用说明                                                | 是否必填 |
-| --------- | -------------- | ------------------------------------------------------- | -------- |
-| model     | 需要hook的模型 | 数据类型：torch.nn.Module，建议设置为最外层的torch模型  | 是       |
-| config    | Hook配置       | 数据类型：DumpConfig                                    | 是       |
-| hook_type | hook类型       | 数据类型：str，默认值为dump_data，当前仅支持dump_data。 | 否       |
-
-###### 使用示例
-
-```
-from ait_llm import DumpConfig, register_hook
-dump_config = DumpConfig(dump_path="./ait_dump")
-register_hook(model, dump_config)  # model是要dump中间tensor的模型实例，在模型初始化后添加代码
-```
-
-###### dump 落盘位置
-
-Dump默认落盘路径 `{DUMP_DIR}`在当前目录下，如果在DumpConfig中指定dump_path，落盘路径则为指定的 `{DUMP_PATH}`。
-
-- tensor信息会生成在默认落盘路径的ait_dump目录下，具体路径是 `{DUMP_DIR}/ait_dump/torch_tensors/{device_id}_{PID}/{TID}`目录下
-- model信息会生成在默认落盘路径的ait_dump目录下，具体路径是 `{DUMP_DIR}/ait_dump/torch_tensors/{device_id}_{PID}/model_tree.json`
-
-注：`{device_id}`为设备号；`{PID}`为进程号；`{TID}`为 `token_id`
-
-### 1.2 自动比对能力
-
-提供有精度问题的模型数据与标杆模型数据之间的自动比对能力。
-
-
-#### 使用方式
-
-```shell
-ait llm compare --golden-path xx --my-path xx [可选参数]
-```
-
-##### 参数说明
-
-| 参数名                 | 描述                                                         | 是否必选 |
-| ---------------------- | ------------------------------------------------------------ | -------- |
-| --golden-path, -gp     | 标杆数据路径，支持单个数据文件路径或文件夹                   | 是       |
-| --my-path, -mp         | 待比较的数据路径，为单个数据文件路径                         | 是       |
-| --op-mapping-file, -mf | 算子类型映射关系文件路径，加速库模型与torch模型比对场景下按需提供 | 否       |
-| --log-level, -l        | 日志级别，默认为info，可选值有：debug，info，warning，warn，error | 否       |
-| --output, -o           | 比对结果csv的输出路径                                        | 否       |
-
-ait llm 1.0版本支持以下场景的自动比对：
-
-- 单个tensor文件之间的自动比对，tensor文件格式支持加速库dump的bin文件、torch.save以及numpy.save的文件，使用示例如下
-
-  ```shell
-  ait llm compare -gp xx.pth -mp xx.bin
-  ```
-
-- 加速库模型与torch模型之间的自动比对，具体使用请参考[使用指导](./自动映射比对能力说明.md)；
-
-- 加速库模型（浮点）与加速库模型（量化）之间的自动比对；
-
-- 加速库模型组图不变，不同batch_size、dtype、运行版本等变量下的自动比对；
-
-### 1.3 单算子精度预检
-
-提供加速库内置算子的精度预检能力，根据模型推理时dump的tensor及算子信息，计算标杆output，比较dump的算子output与标杆数据的误差，以检测算子精度是否达标。具体参考[精度预检能力使用说明](./精度预检能力使用说明.md)。
-
-#### 使用方式
-
-```
-ait llm opcheck -i {tensor_dir} -c {op_csv_path} -o {output_dir}
-```
-
-##### 参数说明
-
-| 参数名                      | 描述                                                         | 是否必选 |
-| --------------------------- | ------------------------------------------------------------ | -------- |
-| --input, -i                 | tensor数据路径，为文件夹，由ait llm dump --type tensor落盘，示例：OUTPUT_DIR/PID_TID/0/ | 是       |
-| --csv-path, -c              | 算子信息csv文件路径，为单个数据文件路径，由ait llm dump --type op落盘，示例：OUTPUT_DIR/ait_dump/operation_io_tensors/PID/operation_tensors_0.csv | 是       |
-| --output, -o                | 输出文件的保存路径，为文件夹，示例：xx/xxx/xx                | 否       |
-| --operation-ids, -ids       | 选择预检指定索引的tensor，默认为空，全量算子预检。使用方式：-ids 24_1,2_3_5 | 否       |
-| --operation-name, -opname   | 指定需要预检的算子类型，支持模糊指定，如selfattention只需要填写self。使用方式：-opname self，linear | 否       |
-| --precision-metric, -metric | 指定需要输出的精度类型，可选范围：['abs', 'cos_sim'，'kl']，分别表示绝对误差通过率、余弦相似度、KL散度。默认为[]，即只输出相对误差通过率。使用方式：--metric kl cos_sim | 否       |
-| --device-id, -device        | 指定需要使用的NPU设备，默认为0                               | 否       |
-| --atb-rerun, -rerun         | 选择是否重新运行加速库单算子获得output，默认为false，即不运行加速库单算子，直接对比dump数据中的output。使用方式：-rerun | 否       |
-
-
-### 1.4 异常检测
-
-提供模型推理过程中出现的异常检测能力，如算子预算溢出、内存踩踏等，1.0版本仅支持溢出检测。
-
-#### 使用方式：
-
-```shell
-ait llm errcheck --exec xxx [可选参数]
-```
-
-#### 参数说明
-
-| 参数名       | 描述                                                         | 是否必选 |
-| ------------ | ------------------------------------------------------------ | -------- |
-| --exec       | 执行模型推理的命令                                           | 是       |
-| --type       | 异常检测类型，可选值['overflow']，当前仅支持溢出检测         | 否       |
-| --exit       | 检测到异常后进程是否退出，默认关闭                           | 否       |
-| --output, -o | 检测结果输出目录，默认为当前目录，如果没有异常则不输出结果文件 | 否       |
-
-
-
-## 2. 基于torch图模式（torchair）推理场景
-
-### 2.1 GE dump 数据与 FX dump 数据精度比对
-
-#### 1）Dump 数据
-
-- **GE 模式 dump 数据** 添加 `get_ge_dump_config`，获取配置后的 `CompilerConfig` 实例，配置模型 compile，并执行推理
-
-  ```py
-  import torch, torch_npu, torchair
-  from ait_llm.dump import torchair_dump  # 添加导入
-  ...
-  model = ...
-  config = torchair_dump.get_ge_dump_config(dump_path="dump")  # 添加获取 config
-  ...
-  npu_backend = torchair.get_npu_backend(compiler_config=config)
-  model = torch.compile(model, backend=npu_backend, dynamic=True)
-  ...
-  ```
-
-  输出路径为指定的 `{dump_path}/dump_{time_stamp}`
-
-- **FX 模式 dump 数据** 添加 `get_fx_dump_config`，获取配置后的 `CompilerConfig` 实例，配置模型 compile，并执行推理
-
-  ```py
-  import torch, torch_npu, torchair
-  from ait_llm.dump import torchair_dump  # 添加导入
-  ...
-  model = ...
-  config = torchair_dump.get_fx_dump_config()  # 添加获取 config
-  ...
-  npu_backend = torchair.get_npu_backend(compiler_config=config)
-  model = torch.compile(model, backend=npu_backend, dynamic=True)
-  ...
-  ```
-
-  输出路径为当前文件夹下的 `gm_{time stamp}_dump`
-
-#### 2）Compare 精度比对
-
-  - 执行 `ait llm compare --my-path [GE dump data] --golden-path [FX dump data]`，输出比对结果 csv 文件
-
-    ```sh
-    ait llm compare --my-path {dump_path}/dump_{time_stamp} --golden-path gm_{time stamp}_dump
-    ```
-
-***
-
-### 2.2 融合的 GE dump 数据与关闭融合的 GE dump 数据精度比对
-
-#### 1）Dump 数据
-
-- **GE 模式 dump 数据** 添加 `get_ge_dump_config`，获取配置后的 `CompilerConfig` 实例，配置模型 compile，并执行推理
-
-  ```py
-  import torch, torch_npu, torchair
-  from ait_llm.dump import torchair_dump  # 添加导入
-  ...
-  model = ...
-  config = torchair_dump.get_ge_dump_config(dump_path="dump")  # 添加获取 config
-  ...
-  npu_backend = torchair.get_npu_backend(compiler_config=config)
-  model = torch.compile(model, backend=npu_backend, dynamic=True)
-  ...
-  ```
-
-  输出路径为指定的 `{dump_path}/dump_{time_stamp}`
-
-- **GE 模式关闭融合 dump 数据** 添加 `get_ge_dump_config`，指定 `fusion_switch_file` 文件，获取配置后的 `CompilerConfig` 实例，配置模型 compile，并执行推理
-
-  ```py
-  import torch, torch_npu, torchair
-  from ait_llm.dump import torchair_dump  # 添加导入
-  ...
-  model = ...
-  config = torchair_dump.get_ge_dump_config(dump_path="dump", fusion_switch_file="fusion_switch.json")  # 添加获取 config
-  ...
-  npu_backend = torchair.get_npu_backend(compiler_config=config)
-  model = torch.compile(model, backend=npu_backend, dynamic=True)
-  ...
-  ```
-
-  参考的 `fusion_switch.json` 文件
-
-  ```json
-  {
-    "Switch": {
-      "GraphFusion": {
-        "ALL": "off"
-      },
-      "UBFusion": {
-        "ALL": "off"
-      }
-    }
-  }
-  ```
-
-  输出路径为指定的 `{dump_path}/dump_{time_stamp}`
-
-#### 2）Compare 比对
-
-- 执行 `ait llm compare --my-path [GE dump data] --golden-path [fusion off GE dump data]`，输出比对结果 csv 文件
-
-  ```sh
-  ait llm compare --my-path {dump_path}/dump_{time_stamp} --golden-path {dump_path}/dump_{time_stamp}
-  ```
+   - 如果比对算子输入输出，需要根据网络结构分析，进行算子映射。也可以手动写映射关系
+   - 目前支持比对算法有：余弦相似度等，也支持自定义比对算法
+   - 可以指定告警阈值

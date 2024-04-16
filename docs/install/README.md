@@ -7,10 +7,10 @@
 ait推理工具的安装包括**ait包**和**依赖的组件包**的安装，其中依赖包可以根据需求只添加所需要的组件包。
 
 
-| 依赖软件名称        | 是否必选 | 版本 | 备注                                                                                                                                                                                     |
-|-----------------|---|--|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| CANN              | 必选  | 建议安装CANN商业版6.3.RC1以上版本 | 请参见《[CANN-6.3.RC1](https://www.hiascend.com/document/detail/zh/canncommercial/63RC1/envdeployment/instg/instg_000002.html)》安装昇腾设备开发或运行环境，即toolkit软件包。安装后请根据安装提示配置环境变量（可以参考  [配置环境变量](#说明) ）。                       |
-| GCC               | 必选 | 7.3.0版本                                | 请参见《[GCC安装指引](https://www.hiascend.com/document/detail/zh/canncommercial/63RC1/envdeployment/instg/instg_000091.html)》安装GCC编译器（centos 7.6平台默认为gcc 4.8编译器，可能**无法安装**本工具，建议更新gcc编译器后再安装） |
+|   依赖软件名称   | 是否必选 | 版本 |                      备注                      |
+|-----------------|---------|------|------------------------------------------------|
+| CANN              | 必 选  | 建议安装CANN商业版6.3.RC1以上版本 | 请参见《[CANN-6.3.RC1](https://www.hiascend.com/document/detail/zh/canncommercial/63RC1/envdeployment/instg/instg_000002.html)》安装昇腾设备开发或运行环境，即toolkit软件包。安装后请根据安装提示配置环境变量（可以参考  [配置环境变量](#说明) ）。                       |
+| GCC               | 必 选 | 7.3.0版本                                | 请参见《[GCC安装指引](https://www.hiascend.com/document/detail/zh/canncommercial/63RC1/envdeployment/instg/instg_000091.html)》安装GCC编译器（centos 7.6平台默认为gcc 4.8编译器，可能**无法安装**本工具，建议更新gcc编译器后再安装） |
 | Python               | 必选 | 支持Python3.7.5+、Python3.8.x、Python3.9.x、Python3.10.x | 如使用TensorFlow模型的精度对比功能则需要Python3.7.5版本                                                                                                               |
 | TensorFlow  | 非必选 | -                                      | 参考 [Centos7.6上TensorFlow1.15.0 环境安装](https://bbs.huaweicloud.com/blogs/181055) 安装 TensorFlow1.15.0 环境。(如不使用TensorFlow模型的精度对比功能则不需要安装)                                                  |
 | Caffe    | 非必选 | -    | 参考 [Caffe Installation](http://caffe.berkeleyvision.org/installation.html) 安装 Caffe 环境。(如不使用 Caffe 模型的精度对比功能则不需要安装)                                                                    |
@@ -22,7 +22,7 @@ ait推理工具的安装包括**ait包**和**依赖的组件包**的安装，其
 安装方式包括：**源代码一键式安装**和**按需手动安装不同组件**，用户可以按需选取。
 - [源代码一键式安装](#源代码一键式安装): 一键式安装ait所有组件
 - [按需手动安装不同组件](#按需手动安装不同组件): 可以按需选择所需ait组件，单个安装
-s
+
 常见报错可以参照[Ait 安装常见问题](#常见问题-qa)
 
 ### 说明：
